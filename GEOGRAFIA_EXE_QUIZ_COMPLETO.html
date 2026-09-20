@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GEOGRAFIA.EXE</title>
+<style>
+body{margin:0;background:#008080;font-family:Tahoma,sans-serif}
+.win{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+width:280px;background:#c0c0c0;border:2px solid #000;box-shadow:3px 3px #000;transition:.3s}
+.big{width:95vw;max-width:850px}
+.title{background:#000080;color:#fff;padding:4px 8px;font-weight:bold}
+.content{padding:12px}
+.alt{display:block;margin:10px 0;padding:12px;background:#fff;border:1px solid #666;font-size:18px}
+button{padding:8px 14px}
+#status{font-weight:bold;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div id="win" class="win">
+<div class="title">GEOGRAFIA.EXE</div>
+<div class="content" id="content">
+<p>Bem-vindo.</p>
+<p>Deseja iniciar a avaliação?</p>
+<button onclick="iniciar()">Iniciar</button>
+</div>
+</div>
+
+<script>
+const perguntas=[
+{p:"Qual sub-região é uma área de transição entre a Zona da Mata e o Sertão?",a:["Zona da Mata","Agreste","Sertão","Meio-Norte"],c:1},
+{p:"Qual é o clima predominante do Sertão?",a:["Tropical úmido","Polar","Semiárido","Equatorial"],c:2},
+{p:"O que o Polo Industrial de Manaus gera principalmente?",a:["Empregos","Vulcões","Geleiras","Terremotos"],c:0},
+{p:"Qual atividade pode causar desmatamento?",a:["Exploração madeireira","Leitura","Reciclagem","Turismo escolar"],c:0},
+{p:"Os rios são importantes para os ribeirinhos porque servem para:",a:["Pesca e transporte","Esqui","Vulcanismo","Mineração lunar"],c:0}
+];
+
+let usadas=[];
+let acertos=0;
+let erros=0;
+let atual=-1;
+
+function iniciar(){
+ document.getElementById("win").classList.add("big");
+ proxima();
+}
+
+function proxima(){
+ if(usadas.length===perguntas.length){
+   document.getElementById("content").innerHTML=`
+   <h2>Resultado Final</h2>
+   <p>Acertos: ${acertos}</p>
+   <p>Erros: ${erros}</p>
+   <p>Nota: ${(acertos/perguntas.length*10).toFixed(1)}</p>
+   <button onclick="location.reload()">Reiniciar</button>`;
+   return;
+ }
+
+ do{
+   atual=Math.floor(Math.random()*perguntas.length);
+ }while(usadas.includes(atual));
+
+ usadas.push(atual);
+
+ let q=perguntas[atual];
+ let letras=["A","B","C","D"];
+
+ let html=`<div id="status">Acertos: ${acertos} | Erros: ${erros}</div>
+ <h3>${q.p}</h3>`;
+
+ q.a.forEach((x,i)=>{
+   html+=`<label class="alt"><input type="radio" name="r" value="${i}"> ${letras[i]}) ${x}</label>`;
+ });
+
+ html+=`<button onclick="responder()">Responder</button>
+ <div id="msg"></div>`;
+
+ document.getElementById("content").innerHTML=html;
+}
+
+function responder(){
+ let marcada=document.querySelector('input[name="r"]:checked');
+ if(!marcada){
+   alert("Escolha uma alternativa.");
+   return;
+ }
+
+ let correta=perguntas[atual].c;
+
+ if(Number(marcada.value)===correta){
+   acertos++;
+   document.getElementById("msg").innerHTML="<p>✔ Correto!</p><button onclick='proxima()'>Próxima</button>";
+ }else{
+   erros++;
+   document.getElementById("msg").innerHTML="<p>✖ Incorreto.</p><button onclick='proxima()'>Próxima</button>";
+ }
+
+ document.querySelectorAll('input[name="r"]').forEach(x=>x.disabled=true);
+}
+</script>
+</body>
+</html>
